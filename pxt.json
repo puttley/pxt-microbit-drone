@@ -1,6 +1,6 @@
 {
     "name": "microbit-drone",
-    "version": "0.1.0",
+    "version": "0.1.1",
     "description": "Guarded Crazyflie control blocks using a micro:bit USB serial bridge.",
     "license": "MIT",
     "dependencies": {

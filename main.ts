@@ -1,7 +1,7 @@
 /**
  * Guarded Crazyflie commands sent through the PC serial bridge.
  */
-//% color=#006970 weight=90 icon="\uf1d8" block="Drone"
+//% color=#006970 weight=90 icon="\uf1d8" block="Pitsco Drone"
 namespace drone {
     let armed = false
     let response = ""

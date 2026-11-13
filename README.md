@@ -32,7 +32,7 @@ micro:bit to the Crazyflie radio.
 2. Select **Extensions**.
 3. Paste this repository URL into the search box:
    `https://github.com/puttley/pxt-microbit-drone`
-4. Select the extension to add the **Drone** category to the toolbox.
+4. Select the extension to add the **Pitsco Drone** category to the toolbox.
 
 ## Minimal block sequence
 
