@@ -3,6 +3,8 @@
  */
 //% color=#006970 weight=90 icon="\uf1d8" block="Pitsco Drone"
 namespace drone {
+    const RESPONSE_POLL_MS = 10
+    const RESPONSE_TIMEOUT_POLLS = 1500
     let armed = false
     let airborne = false
     let commandBusy = false
@@ -12,7 +14,18 @@ namespace drone {
     function sendCommand(command: string): string {
         commandBusy = true
         serial.writeLine(command)
-        response = serial.readUntil(serial.delimiters(Delimiters.NewLine))
+
+        // USB serial reads may return before the PC bridge has replied. Poll
+        // for a complete line so the next command cannot consume this reply.
+        response = ""
+        for (let attempt = 0; attempt < RESPONSE_TIMEOUT_POLLS; attempt++) {
+            response = serial.readUntil(serial.delimiters(Delimiters.NewLine))
+            if (response.length > 0) {
+                break
+            }
+            basic.pause(RESPONSE_POLL_MS)
+        }
+
         commandBusy = false
         return response
     }
@@ -45,6 +58,7 @@ namespace drone {
         response = ""
         serial.redirectToUSB()
         serial.setBaudRate(BaudRate.BaudRate115200)
+        serial.readString()
         startHeartbeat()
     }
 
