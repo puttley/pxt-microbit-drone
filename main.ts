@@ -21,6 +21,13 @@ namespace drone {
         Right
     }
 
+    export enum AltitudeDirection {
+        //% block="up"
+        Up,
+        //% block="down"
+        Down
+    }
+
     const RESPONSE_POLL_MS = 10
     const RESPONSE_TIMEOUT_POLLS = 1500
     let armed = false
@@ -231,6 +238,36 @@ namespace drone {
         return sendCommand(
             "TURN:" + directionName + ":" + roundedAngle
         ) == "TURNED"
+    }
+
+    /**
+     * Change height by a bounded amount while airborne.
+     */
+    //% blockId=drone_change_altitude block="change altitude $direction $distanceCm cm"
+    //% distanceCm.min=5 distanceCm.max=30 distanceCm.defl=10
+    //% weight=60
+    export function changeAltitude(
+        direction: AltitudeDirection,
+        distanceCm: number
+    ): boolean {
+        if (!airborne) {
+            response = "ERROR:STATE:GROUND"
+            return false
+        }
+        if (distanceCm < 5 || distanceCm > 30) {
+            response = "ERROR:DISTANCE"
+            return false
+        }
+
+        let directionName = "UP"
+        if (direction == AltitudeDirection.Down) {
+            directionName = "DOWN"
+        }
+
+        let roundedDistance = Math.round(distanceCm)
+        return sendCommand(
+            "ALTITUDE:" + directionName + ":" + roundedDistance
+        ) == "ALTITUDE_CHANGED"
     }
 
     /**

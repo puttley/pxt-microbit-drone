@@ -14,6 +14,7 @@ through a USB-connected micro:bit and a Python PC bridge.
 - `drone is flying`
 - `move [direction] [distance] cm`
 - `turn [direction] [angle] degrees`
+- `change altitude [up/down] [distance] cm`
 - `flight status` (advanced)
 - `run armed test flight`
 - `last drone response` (advanced)
@@ -37,6 +38,8 @@ bounded movement refreshes the bridge heartbeat timer when it completes.
 Yaw turns are limited to 15-180 degrees and use a fixed rate of 72 degrees per
 second. Turns are accepted only while airborne and also refresh the heartbeat
 timer on completion.
+Vertical steps are limited to 5-30 cm. The bridge tracks commanded height and
+rejects a step that would move the target below 0.25 m or above 1.0 m.
 
 ## Architecture
 
