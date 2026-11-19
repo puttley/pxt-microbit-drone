@@ -1,0 +1,16 @@
+Reference,Qty,Function,Manufacturer Part,LCSC Part,Assembly,Status/Notes
+U1,1,nRF52840 radio module,E73-2G4M08S1C,C356849,JLC SMT,Prototype module; verify footprint and antenna orientation
+U2,1,Four-channel joystick ADC,ADS1015IDGSR,C193969,JLC SMT,ADDR tied low for 0x48
+U3,1,Fixed 3.3V buck-boost,TPS63031DSKR,C15516,JLC SMT,Use TI reference layout; exposed pad
+L1,1,Regulator inductor 1.5uH,TBD,TBD,JLC SMT,Select from TPS63031 requirements and current JLC inventory
+Q1,1,Reverse-battery P-channel MOSFET,TBD,TBD,JLC SMT,Must operate adequately at 1.8V gate drive
+D1,1,micro:bit supply isolation Schottky,TBD,TBD,JLC SMT,Low forward drop at approximately 30-80mA
+J1,1,micro:bit full edge socket,TBD,TBD,Hand install,Verify exact physical micro:bit fit
+J2,1,2xAA holder connection,TBD,TBD,Hand install,Keyed two-pin connector or wired holder
+J3,1,SWD programming footprint,Tag-Connect TC2030-IDC or 2x5 1.27mm,N/A,No fitted part,Include SWDIO SWDCLK RESET 3V3 GND
+JS1 JS2,2,Dual-axis 10k joystick,TBD,TBD,Hand install,Exact footprint required before layout
+SW1 SW2 SW3 SW4,4,Face buttons,TBD,TBD,Hand install,Normally open active-low
+SW5,1,Dedicated safety button,TBD,TBD,Hand install,Normally open active-low to nRF
+SW6,1,Main power switch,TBD,TBD,Hand install,Controls regulator EN
+LED1,1,Radio status LED,TBD,TBD,JLC SMT or hand install,Driven by nRF through resistor
+R/C,,Resistors and capacitors,TBD,TBD,JLC SMT,Prefer JLC basic library values
