@@ -48,6 +48,10 @@ rejects a step that would move the target below 0.25 m or above 1.0 m.
 This version is PC-tethered and does not communicate directly from the
 micro:bit to the Crazyflie radio.
 
+The validated Python bridge is included in [`bridge/`](bridge/). The frozen
+serial command contract is documented in
+[`docs/protocol-v1.md`](docs/protocol-v1.md).
+
 ## Add to MakeCode
 
 1. Open the micro:bit MakeCode editor.
