@@ -4,12 +4,33 @@
 //% color=#006970 weight=90 icon="\uf1d8" block="Pitsco Drone"
 namespace drone {
     let armed = false
+    let airborne = false
+    let commandBusy = false
+    let heartbeatStarted = false
     let response = ""
 
     function sendCommand(command: string): string {
+        commandBusy = true
         serial.writeLine(command)
         response = serial.readUntil(serial.delimiters(Delimiters.NewLine))
+        commandBusy = false
         return response
+    }
+
+    function startHeartbeat(): void {
+        if (heartbeatStarted) {
+            return
+        }
+
+        heartbeatStarted = true
+        control.inBackground(function () {
+            while (true) {
+                if (airborne && !commandBusy) {
+                    serial.writeLine("HEARTBEAT")
+                }
+                basic.pause(500)
+            }
+        })
     }
 
     /**
@@ -19,9 +40,12 @@ namespace drone {
     //% weight=100
     export function initialize(): void {
         armed = false
+        airborne = false
+        commandBusy = false
         response = ""
         serial.redirectToUSB()
         serial.setBaudRate(BaudRate.BaudRate115200)
+        startHeartbeat()
     }
 
     /**
@@ -34,9 +58,9 @@ namespace drone {
     }
 
     /**
-     * Open the bridge's short authorization window for one test flight.
+     * Open the bridge's short authorization window for one flight.
      */
-    //% blockId=drone_arm_test block="arm one test flight"
+    //% blockId=drone_arm_test block="arm drone"
     //% weight=80
     export function armTestFlight(): boolean {
         armed = sendCommand("ARM") == "ARMED"
@@ -54,6 +78,55 @@ namespace drone {
     }
 
     /**
+     * Take off to the validated height of 40 cm and hold position.
+     */
+    //% blockId=drone_take_off block="take off"
+    //% weight=65
+    export function takeOff(): boolean {
+        if (!armed) {
+            return false
+        }
+
+        // Consume local authorization before sending the flight command.
+        armed = false
+        airborne = sendCommand("TAKEOFF") == "AIRBORNE"
+        return airborne
+    }
+
+    /**
+     * Perform a controlled landing.
+     */
+    //% blockId=drone_land block="land"
+    //% weight=64
+    export function land(): boolean {
+        let landed = sendCommand("LAND") == "LANDED"
+        if (landed) {
+            airborne = false
+            armed = false
+        }
+        return landed
+    }
+
+    /**
+     * Ask the bridge whether the drone is currently airborne.
+     */
+    //% blockId=drone_is_flying block="drone is flying"
+    //% weight=63
+    export function isFlying(): boolean {
+        airborne = sendCommand("FLIGHT_STATUS") == "AIRBORNE"
+        return airborne
+    }
+
+    /**
+     * Return the bridge flight state as text.
+     */
+    //% blockId=drone_flight_status block="flight status"
+    //% weight=12 advanced=true
+    export function flightStatus(): string {
+        return sendCommand("FLIGHT_STATUS")
+    }
+
+    /**
      * Run one 0.4 m takeoff, five-second hover, and automatic landing.
      */
     //% blockId=drone_run_test block="run armed test flight"
@@ -65,7 +138,9 @@ namespace drone {
 
         // Consume the local authorization before sending the flight command.
         armed = false
-        return sendCommand("TEST_FLIGHT") == "LANDED"
+        let landed = sendCommand("TEST_FLIGHT") == "LANDED"
+        airborne = false
+        return landed
     }
 
     /**

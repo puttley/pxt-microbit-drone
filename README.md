@@ -7,8 +7,12 @@ through a USB-connected micro:bit and a Python PC bridge.
 
 - `initialize drone link`
 - `drone is ready`
-- `arm one test flight`
+- `arm drone`
 - `disarm drone`
+- `take off`
+- `land`
+- `drone is flying`
+- `flight status` (advanced)
 - `run armed test flight`
 - `last drone response` (advanced)
 
@@ -18,6 +22,12 @@ The initial flight command is deliberately constrained. The Python bridge only
 accepts `TEST_FLIGHT` during a 10-second authorization window opened by `ARM`.
 Authorization is consumed before takeoff. The aircraft takes off to 0.4 m,
 hovers for five seconds, and lands automatically.
+
+The persistent-flight development bridge also accepts separate takeoff and
+land commands. While airborne, the extension sends a heartbeat every 500 ms.
+If the Python bridge receives no heartbeat for two seconds, it commands a
+controlled landing. This is a development safety layer and does not replace
+the Crazyflie firmware supervisor.
 
 ## Architecture
 
