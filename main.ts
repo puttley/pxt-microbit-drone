@@ -9,18 +9,22 @@ namespace drone {
     let airborne = false
     let commandBusy = false
     let heartbeatStarted = false
+    let responseHandlerStarted = false
+    let responseReady = false
     let response = ""
 
     function sendCommand(command: string): string {
+        if (commandBusy) {
+            return "BUSY"
+        }
+
         commandBusy = true
+        response = ""
+        responseReady = false
         serial.writeLine(command)
 
-        // USB serial reads may return before the PC bridge has replied. Poll
-        // for a complete line so the next command cannot consume this reply.
-        response = ""
         for (let attempt = 0; attempt < RESPONSE_TIMEOUT_POLLS; attempt++) {
-            response = serial.readUntil(serial.delimiters(Delimiters.NewLine))
-            if (response.length > 0) {
+            if (responseReady) {
                 break
             }
             basic.pause(RESPONSE_POLL_MS)
@@ -28,6 +32,26 @@ namespace drone {
 
         commandBusy = false
         return response
+    }
+
+    function startResponseHandler(): void {
+        if (responseHandlerStarted) {
+            return
+        }
+
+        responseHandlerStarted = true
+        serial.onDataReceived(
+            serial.delimiters(Delimiters.NewLine),
+            function () {
+                let completeLine = serial.readUntil(
+                    serial.delimiters(Delimiters.NewLine)
+                )
+                if (commandBusy && !responseReady) {
+                    response = completeLine
+                    responseReady = true
+                }
+            }
+        )
     }
 
     function startHeartbeat(): void {
@@ -55,10 +79,12 @@ namespace drone {
         armed = false
         airborne = false
         commandBusy = false
+        responseReady = false
         response = ""
         serial.redirectToUSB()
         serial.setBaudRate(BaudRate.BaudRate115200)
         serial.readString()
+        startResponseHandler()
         startHeartbeat()
     }
 
