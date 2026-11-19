@@ -12,6 +12,7 @@ through a USB-connected micro:bit and a Python PC bridge.
 - `take off`
 - `land`
 - `drone is flying`
+- `move [direction] [distance] cm`
 - `flight status` (advanced)
 - `run armed test flight`
 - `last drone response` (advanced)
@@ -28,6 +29,10 @@ land commands. While airborne, the extension sends a heartbeat every 500 ms.
 If the Python bridge receives no heartbeat for two seconds, it commands a
 controlled landing. This is a development safety layer and does not replace
 the Crazyflie firmware supervisor.
+
+Horizontal movement is accepted only while the bridge is in the `AIRBORNE`
+state. Distance is limited to 5-50 cm and speed is fixed at 0.2 m/s. Each
+bounded movement refreshes the bridge heartbeat timer when it completes.
 
 ## Architecture
 
@@ -48,9 +53,10 @@ micro:bit to the Crazyflie radio.
 
 1. Place `initialize drone link` in `on start`.
 2. Use `drone is ready` before attempting to arm.
-3. Use `arm one test flight` to open the bridge's 10-second authorization
-   window.
-4. Use `run armed test flight` during that window.
+3. Use `arm drone` to open the bridge's 10-second authorization window.
+4. Use `take off` during that window.
+5. Use bounded movement blocks only after takeoff.
+6. Use `land` to finish the flight.
 
 The Python bridge must be running before a block that waits for a response is
 executed.

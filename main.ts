@@ -3,6 +3,17 @@
  */
 //% color=#006970 weight=90 icon="\uf1d8" block="Pitsco Drone"
 namespace drone {
+    export enum MoveDirection {
+        //% block="forward"
+        Forward,
+        //% block="backward"
+        Backward,
+        //% block="left"
+        Left,
+        //% block="right"
+        Right
+    }
+
     const RESPONSE_POLL_MS = 10
     const RESPONSE_TIMEOUT_POLLS = 1500
     let armed = false
@@ -155,6 +166,37 @@ namespace drone {
     export function isFlying(): boolean {
         airborne = sendCommand("FLIGHT_STATUS") == "AIRBORNE"
         return airborne
+    }
+
+    /**
+     * Move horizontally while maintaining the current height.
+     */
+    //% blockId=drone_move block="move $direction $distanceCm cm"
+    //% distanceCm.min=5 distanceCm.max=50 distanceCm.defl=20
+    //% weight=62
+    export function move(direction: MoveDirection, distanceCm: number): boolean {
+        if (!airborne) {
+            response = "ERROR:STATE:GROUND"
+            return false
+        }
+        if (distanceCm < 5 || distanceCm > 50) {
+            response = "ERROR:DISTANCE"
+            return false
+        }
+
+        let directionName = "FORWARD"
+        if (direction == MoveDirection.Backward) {
+            directionName = "BACKWARD"
+        } else if (direction == MoveDirection.Left) {
+            directionName = "LEFT"
+        } else if (direction == MoveDirection.Right) {
+            directionName = "RIGHT"
+        }
+
+        let roundedDistance = Math.round(distanceCm)
+        return sendCommand(
+            "MOVE:" + directionName + ":" + roundedDistance
+        ) == "MOVED"
     }
 
     /**
