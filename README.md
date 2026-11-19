@@ -13,6 +13,7 @@ through a USB-connected micro:bit and a Python PC bridge.
 - `land`
 - `drone is flying`
 - `move [direction] [distance] cm`
+- `turn [direction] [angle] degrees`
 - `flight status` (advanced)
 - `run armed test flight`
 - `last drone response` (advanced)
@@ -33,6 +34,9 @@ the Crazyflie firmware supervisor.
 Horizontal movement is accepted only while the bridge is in the `AIRBORNE`
 state. Distance is limited to 5-50 cm and speed is fixed at 0.2 m/s. Each
 bounded movement refreshes the bridge heartbeat timer when it completes.
+Yaw turns are limited to 15-180 degrees and use a fixed rate of 72 degrees per
+second. Turns are accepted only while airborne and also refresh the heartbeat
+timer on completion.
 
 ## Architecture
 

@@ -14,6 +14,13 @@ namespace drone {
         Right
     }
 
+    export enum TurnDirection {
+        //% block="left"
+        Left,
+        //% block="right"
+        Right
+    }
+
     const RESPONSE_POLL_MS = 10
     const RESPONSE_TIMEOUT_POLLS = 1500
     let armed = false
@@ -197,6 +204,33 @@ namespace drone {
         return sendCommand(
             "MOVE:" + directionName + ":" + roundedDistance
         ) == "MOVED"
+    }
+
+    /**
+     * Rotate in place while maintaining the current position and height.
+     */
+    //% blockId=drone_turn block="turn $direction $angleDegrees degrees"
+    //% angleDegrees.min=15 angleDegrees.max=180 angleDegrees.defl=45
+    //% weight=61
+    export function turn(direction: TurnDirection, angleDegrees: number): boolean {
+        if (!airborne) {
+            response = "ERROR:STATE:GROUND"
+            return false
+        }
+        if (angleDegrees < 15 || angleDegrees > 180) {
+            response = "ERROR:ANGLE"
+            return false
+        }
+
+        let directionName = "LEFT"
+        if (direction == TurnDirection.Right) {
+            directionName = "RIGHT"
+        }
+
+        let roundedAngle = Math.round(angleDegrees)
+        return sendCommand(
+            "TURN:" + directionName + ":" + roundedAngle
+        ) == "TURNED"
     }
 
     /**
